@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container text-center">
+  
+  <div class="row">
+
+    <div class="m-3 col-md bg-light rounded-3">
+      <div class="container-fluid py-2">
+        <em><p class="m-0">{{ workout.date_posted.strftime('%B %d, %Y') }}</p></em>
+        <h1 class="display-6 fw-bold">{{ workout.title }}</h1>
+        <p class="lh-sm" style="white-space:pre-wrap;">{{ workout.description }}</p>
+
+        <button class="btn btn-primary mb-2 btn-lg" type="button" id="log-result-btn">Log results</button>
+      </div>
+    </div>
+
+    <div class="m-3 col-md bg-light rounded-3 d-flex align-items-center d-none" id="log-result-div">
+      <div class="container-fluid py-2">
+        <form method="POST" id="log-result-form">
+          
+          {{ form.hidden_tag() }}
+
+          {% for field in form if field.widget.input_type != 'hidden' %}
+            {% for error in field.errors %}
+              <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+
+            {{ field(placeholder=field.label.text, class="form-control form-control-lg my-2") }}
+
+          {% endfor %}
+        
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary my-1" id="save-result-btn">Save</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    
+    <div class="row justify-content-center mt-5" id="results-div">
+      <div class="col-sm-9">
+        <ul class="list-group">
+          {% for result in result_list %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="ms-2">
+                <a href="/users/{{ result.user.id }}">
+                  <img src="{{ result.user.image_url }}" alt="user image" class="timeline-image me-2">
+                </a>
+                <a href="/users/{{ result.user.id }}">@{{ result.user.username }}</a>
+                <span class="text-muted small">{{ result.date_completed.strftime('%B %d, %Y  %I:%M %p') }}</span>
+              </div>
+              <div class="result-area text-end">
+                <div class="fw-bold">{{ result.score }}</div>
+                <div>{{ result.comment }}</div>
+                <a class="small text-secondary res-comment-btn cursor-pointer" id="res-comment-btn-{{result.id}}" >Comments</a>
+              </div>
+            </div>
+
+            <ul class="list-group d-none" id="res-comment-list-{{result.id}}">
+
+
+              {% for res_comment in result.res_comments %}
+                <li class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="ms-2">
+                      <a href="/users/{{ res_comment.user_id }}">
+                        <img src="{{ res_comment.user.image_url }}" alt="user image" class="timeline-image me-2">
+                      </a>
+                      <a href="/users/{{ res_comment.user_id }}">@{{ res_comment.user.username }}</a>
+                      <span class="text-muted small">{{ res_comment.date.strftime('%B %d, %Y  %I:%M %p') }}</span>
+                    </div>
+                    <div class="result-area text-end">
+                      <div>{{ res_comment.res_comment }}</div>
+                    </div>
+                  </div>
+                </li>
+              {% endfor %}
+              <input type="text" placeholder="Comment" name="res-comment-field-{{result.id}}" id="res-comment-field-{{result.id}}" class="form-control">
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-outline-secondary mt-1" id="res-comment-save-btn-{{result.id}}">Save</button>
+              </div>
+            </ul>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <figure class="m-5">
+    <blockquote class="blockquote">
+      <p>{{quote.quote}}</p>
+    </blockquote>
+    <figcaption class="blockquote-footer">
+      {{quote.author}}
+    </figcaption>
+  </figure>
+</div>
+
+
+
+
+{% endblock %}
+

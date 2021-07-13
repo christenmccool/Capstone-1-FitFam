@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h1 class="text-center my-4">Edit Profile</h1>
+
+      <form method="POST" id="signup_form">
+        {{ form.hidden_tag() }}
+        {% for field in form if field.widget.input_type != 'hidden' and field.id != 'password' and field.id != 'account_type' and field.id != 'primary_family_id'%}
+
+          {% for error in field.errors %}
+            <div class="small text-danger">{{ error }}</div>
+          {% endfor %}
+      
+          {{field.label(class_="form-label mb-0")}}
+          {{field(class_="form-control mb-2")}}
+        {% endfor %}
+
+        {% for error in form.account_type.errors %}
+          <div class="small text-danger">{{ error }}</div>
+        {% endfor %}  
+        {{form.account_type.label(class_="form-label mb-0")}}
+        {{form.account_type(class_="form-select mb-2")}}
+
+        {% for error in form.primary_family_id.errors %}
+        <div class="small text-danger">{{ error }}</div>
+        {% endfor %}  
+        {{form.primary_family_id.label(class_="form-label mb-0")}}
+        {{form.primary_family_id(class_="form-select mb-2")}}
+
+
+        <p class="mb-0 mt-4">To confirm changes, enter your password:</p>
+        {% if form.password.errors %}
+          {% for error in form.password.errors %}
+            <span class="text-danger">
+            {{ error }}
+          </span>
+          {% endfor %}
+        {% endif %}
+        {{ form.password(placeholder="password", class="form-control my-0") }}
+
+        
+      <div class="d-grid">
+        <button type="submit" class="btn btn-dark mt-2">Edit</button>
+      </div>
+    </form>
+      
+    </div>
+  </div>
+
+{% endblock %}

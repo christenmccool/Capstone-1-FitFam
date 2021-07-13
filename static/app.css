@@ -1,0 +1,30 @@
+
+
+.timeline-image {
+    border-radius: 40px;
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+    margin-top: 2px;
+  }
+
+  .profile-image {
+    border-radius: 200px;
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+    margin-top: 2px;
+  }
+
+  .cursor-pointer{
+    cursor: pointer;
+  }
+
+  #calendar {
+    margin: 20px auto;
+  }
+
+  table {
+    table-layout: fixed ;
+    width: 100% ;
+  }

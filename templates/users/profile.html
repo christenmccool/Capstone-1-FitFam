@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container justify-content-center align-items-center">
+  <div class="row align-items-center my-4" id="user_profile">
+    <div class="col-md-4 text-center">
+      <a href="/users/{{ user.id }}">
+        <img src="{{ user.image_url }}" alt="user image" class="profile-image">
+      </a>
+    </div>
+    <div class="col-md-8 text-center">
+      <a class="fw-bold fs-3" href="/users/{{ user.id }}">@{{ user.username }}</a>
+      <p class="fw-bold fs-4">{{ user.first_name.capitalize() }} {{ user.last_name.capitalize() }}</p>
+      <p class="text-muted">{{ user.bio }}</p>
+      <a type="button" href="/users/edit" class="btn btn-sm btn-secondary my-1" id="save-result-btn">Edit Profile</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
