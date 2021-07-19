@@ -5,7 +5,7 @@ import requests
 from secret import API_KEY
 from datetime import datetime, date, timedelta
 
-
+from models.quote import Quote
 from models.workout import Workout_from_db
 
 db.session.rollback()
