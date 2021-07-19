@@ -8,14 +8,13 @@ from models.workout import Workout
 from models.result import Result, ResComment
 from models.workout import Workout_from_db
 
-
 import requests
 from secret import API_KEY
 from datetime import date, timedelta
 
-db.session.rollback()
-db.session.commit()
-
+# db.session.rollback()
+# db.session.commit()
+db.session.close()
 db.drop_all()
 db.create_all()
 
