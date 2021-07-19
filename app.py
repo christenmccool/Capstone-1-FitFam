@@ -7,6 +7,7 @@ from db import db, connect_db, update_db
 import functools
 from forms import SignupForm, LoginForm, ResultForm, ResCommentForm, UserEditForm, WorkoutAddForm, WorkoutEditForm
 from secret import API_KEY
+import os
 
 app = Flask(__name__)
 connect_db(app)
@@ -19,7 +20,9 @@ from models.result import Result, ResComment
 from datetime import datetime, date
 
 app.config['SECRET_KEY'] = 'allfoodfits'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///fitfam'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///fitfam'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgres:///fitfam').replace("://", "ql://", 1)
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
@@ -603,72 +606,6 @@ def search_workouts():
 
 
 
-
-
-
-
-
-
-SUGARWOD_BASE_URL = "https://api.sugarwod.com/v2"
-
-@app.route('/workout')
-def workout():
-    url = SUGARWOD_BASE_URL + '/workouts'
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    workout = response.json()
-    return workout
-
-
-@app.route('/heroes')
-def heroes():
-    url = SUGARWOD_BASE_URL + '/benchmarks/category/heroes'
-    # url = SUGARWOD_BASE_URL + '/benchmarks/category/heroes?page[skip]=0&page[limit]=100'
-
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    heroes = response.json()
-    return heroes
-
-@app.route('/girls')
-def girls():
-    # url = SUGARWOD_BASE_URL + '/benchmarks/category/girls?page[skip]=30&page[limit]=50'
-    url = SUGARWOD_BASE_URL + '/benchmarks/category/girls'
-
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    girls = response.json()
-    return girls
-
-@app.route('/games')
-def games():
-    # url = SUGARWOD_BASE_URL + '/benchmarks/category/games'
-    url = SUGARWOD_BASE_URL + '/benchmarks/category/games?page[skip]=0&page[limit]=100'
-
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    games = response.json()
-    return games
-
-@app.route('/gymnastics')
-def gymnastics():
-    # url = SUGARWOD_BASE_URL + '/benchmarks/category/games'
-    url = SUGARWOD_BASE_URL + '/benchmarks/category/gymnastics?page[skip]=0&page[limit]=100'
-
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    gymnastics = response.json()
-    return gymnastics
-
-@app.route('/slate')
-def slate():
-    url = SUGARWOD_BASE_URL + '/workouts?dates=20210708-20210715'
-
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    slate = response.json()
-    return slate
-
-@app.route('/movements')
-def movements():
-    url = SUGARWOD_BASE_URL + '/movements'
-    response = requests.get(url, params= {"apiKey": API_KEY})
-    movements = response.json()
-    return movements
 
 
 
