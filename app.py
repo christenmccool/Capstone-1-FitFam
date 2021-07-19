@@ -68,9 +68,9 @@ def update_db():
 
     return {"DEFAULT_QUOTE": DEFAULT_QUOTE, "DEFAULT_WORKOUT": DEFAULT_WORKOUT}
 
-default_values = update_db()
-DEFAULT_QUOTE = default_values['DEFAULT_QUOTE']
-DEFAULT_WORKOUT = default_values['DEFAULT_WORKOUT']
+# default_values = update_db()
+# DEFAULT_QUOTE = default_values['DEFAULT_QUOTE']
+# DEFAULT_WORKOUT = default_values['DEFAULT_WORKOUT']
 
 
 def check_logged_in(func):
