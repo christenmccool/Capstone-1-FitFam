@@ -16,11 +16,6 @@ class Result(db.Model):
         db.ForeignKey('users.id')
     )
 
-    family_id = db.Column(
-        db.Integer,
-        db.ForeignKey('families.id')
-    )
-
     workout_id = db.Column(
         db.Integer,
         db.ForeignKey('workouts.id')
@@ -40,11 +35,8 @@ class Result(db.Model):
         db.Text
     )
 
-    user = db.relationship('User', backref='result', cascade = "all,delete")
-
-    family = db.relationship('Family', backref='results', cascade = "all,delete")
-
-    workout = db.relationship('Workout', backref='results', cascade = "all,delete")
+    user = db.relationship('User', backref='results')
+    res_comments = db.relationship('ResComment', backref='result', cascade = "all,delete")
 
 
 class ResComment(db.Model):
@@ -77,8 +69,7 @@ class ResComment(db.Model):
         db.Text
     )
 
-    user = db.relationship('User', cascade = "all,delete")
-    result = db.relationship('Result', backref='res_comments', cascade = "all,delete")
+    user = db.relationship('User')
 
 
     def serialize(self):

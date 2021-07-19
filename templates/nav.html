@@ -17,15 +17,23 @@
           </li>
           {% if g.user %}
           <li class="nav-item">
-            <a class="nav-link text-white" href="{{ url_for('show_log', user_id=g.user.id) }}">Log</a>
+            <a class="nav-link text-white" href="{{ url_for('show_log') }}">Log</a>
           </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link text-white" href="">Calendar</a>
-          </li> -->
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{{ url_for('show_plan') }}">Plan</a>
+          </li>
           {% endif %}
         </ul>
 
         {% if g.user %}
+
+          {% if g.user.role == 'admin' %}
+          <div class="navbar-nav mb-2 mb-md-0 gap-2">
+            <div class="d-flex mb-1 mb-md-0">
+              <a href="{{ url_for('make_plan', family_id=g.user.primary_family_id) }}" class="btn btn-primary" id="admin-btn">Admin</a>
+            </div>
+          </div>
+          {% endif %}
         <div class="navbar-nav ms-auto mb-2 mb-md-0 gap-2">
           <a class="d-none d-md-inline" href="{{ url_for('show_user', user_id=g.user.id) }}">
             <img src="{{ g.user.image_url }}" alt="user image" class="timeline-image">

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-5">
+      <h1 class="text-center my-4">Edit Workout</h1>
+
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.widget.input_type != 'hidden' and field.type != 'DateField' and field.type != 'BooleanField' and field.type != 'SelectField'%}
+          {% for error in field.errors %}
+            <small class="text-danger">{{ error }}</small>
+          {% endfor %}
+      
+          {{ field(placeholder=field.label.text, class="form-control form-control-lg my-2") }}
+
+        {% endfor %}
+
+        {% for error in form.date_posted.errors %}
+        <div class="small text-danger">{{ error }}</div>
+        {% endfor %}  
+        {{form.date_posted.label(placeholder="%Y-%m-%d", class_="form-label mb-0")}}
+        {{form.date_posted(type='date', class_="form-control mb-2")}}
+
+        {% for error in form.score_type.errors %}
+        <div class="small text-danger">{{ error }}</div>
+        {% endfor %}  
+        {{form.score_type.label(class_="form-label mb-0")}}
+        {{form.score_type(class_="form-select mb-2")}}
+
+        {% for error in form.primary.errors %}
+          <div class="small text-danger">{{ error }}</div>
+        {% endfor %}  
+        {{form.primary.label(class_="form-label mb-0")}}
+        {{form.primary(class_="form-check mb-2")}}
+
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary my-1">Save changes</button>
+        </div>
+
+      </form>
+    
+    </div>
+  </div>
+
+{% endblock %}

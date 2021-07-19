@@ -78,19 +78,22 @@ $("#family-search-btn").click(async function() {
   $("#searchModal .modal-body").append(html)
 });
 
+
 $("#log-result-btn").click(function() {
   $("#log-result-div").removeClass("d-none");
 })
 
 $("#results-div").click(async function() {
   if (event.target.id.includes('res-comment-btn')) {
-    const targetId = event.target.id
-    const id = targetId.slice(-1)
+    let targetId = event.target.id
+    targetId = targetId.split('-')
+    const id = targetId[targetId.length-1]
     $(`#res-comment-list-${id}`).toggleClass("d-none");
   }
   if (event.target.id.includes('res-comment-save-btn')) {
-    const targetId = event.target.id
-    const id = targetId.slice(-1)
+    let targetId = event.target.id
+    targetId = targetId.split('-')
+    const id = targetId[targetId.length-1]
     const response = await axios.post(`/results/${id}`, {res_comment : $(`#res-comment-field-${id}`).val()})
     const res_comment = response.data.result
     const html = `<li class="list-group-item">
@@ -106,6 +109,16 @@ $("#results-div").click(async function() {
                         <div>${res_comment.res_comment}</div>
                       </div>
                     </div>
+
+                    <div class="d-flex justify-content-end">
+                    <form action="/comments/${res_comment.id}/edit">
+                      <button type="submit" class="btn btn-sm btn-light text-secondary py-0 my-1 me-2" id="edit-res_comment-btn">Edit</button>
+                    </form>
+                    <form action="/comments/${res_comment.id}/delete" method="post">
+                      <button type="submit" class="btn btn-sm btn-light text-secondary py-0 my-1" id="del-res_comment-btn">Delete</button>
+                    </form>
+                  </div>
+
                   </li>`
     $(`#res-comment-list-${id} input`).before(html)
     $(`#res-comment-field-${id}`).val("")
@@ -113,40 +126,107 @@ $("#results-div").click(async function() {
 })
 
 
+let dbWoList = []
+
+$("#option1").on('click', async function() {
+  $("#db-wo-search").addClass("d-none");
+  $("#db-wo-list").removeClass("d-none");
+  $("#add-custom-wo").addClass("d-none");
+  $("#db-wo-radio").empty();
 
 
+  if ($("#db-wo-radio").children().length == 0) {
+    let date = $("#wo-date").val();
+
+    const response = await axios.get('/workouts', {params: {date: date}});
+    console.log(response)
+    const results = response.data.results;
+    if (results.length > 0) {
+      for (workout of results) {
+        dbWoList.push(workout);
+        html = `<div class="container-fluid bg-light py-2 m-2 form-check">
+                  <input type="radio" class="form-check-input mx-1 my-2" name="db-wo-list" id="wo-${workout.id}" value="${workout.id}">
+                  <label class="form-check-label display-6 fw-bold" for="wo-${workout.id}">${workout.title}</label>
+                  <p class="lh-sm" style="white-space:pre-wrap;">${workout.description}</p>  
+                </div>`
+          $("#db-wo-radio").prepend(html)  
+      }
+      $("#db-wo-radio").find('.form-check-input').first().attr('checked', true);
+      $("#db-wo-add-btn").removeClass('d-none')
+    } else {
+      html = `<div class="container-fluid bg-light py-2 m-2 form-check">
+                  <p class="lh-sm" style="white-space:pre-wrap;">No Slate workout posted for this day yet.</p>  
+              </div>`
+          $("#db-wo-radio").prepend(html)  
+    }
+  }
+})
+
+$("#option2").on('click', async function() {
+  $("#db-wo-search").removeClass("d-none");
+  $("#db-wo-list").removeClass("d-none");
+  $("#add-custom-wo").addClass("d-none");
+  $("#db-wo-radio").empty();
+  $("#db-wo-search-field").val("")
+})
 
 
+$("#db-wo-search-btn").on('click', async function() {
+  $("#db-wo-radio").empty();
+  const date = $("#wo-date").val();
+
+  const response = await axios.get('/workouts', {params: {q: $("#db-wo-search-field").val()}});
+  const results = response.data.results;
+
+  for (workout of results) {
+    dbWoList.push(workout);
+    html = `<div class="container-fluid bg-light py-2 m-2 form-check">
+              <input type="radio" class="form-check-input mx-1 my-2" name="db-wo-list" id="wo-${workout.id}" value="${workout.id}">
+              <label class="form-check-label display-6 fw-bold" for="wo-${workout.id}">${workout.title}</label>
+              <p class="lh-sm" style="white-space:pre-wrap;">${workout.description}</p>  
+            </div>`
+    $("#db-wo-radio").prepend(html)  
+    $("#db-wo-radio").find('.form-check-input').first().attr('checked', true);
+  }
+})
 
 
+$("#db-wo-add-btn").on('click', async function(event) {
+  const selected_wo_id = $('input[name="db-wo-list"]:checked').val();
+
+  let title = "";
+  let description = "";
+  let source = "";
+  let score_type = "";
+  let id = "";
+
+  for (workout of dbWoList) {
+    if (workout.id == selected_wo_id) {
+      title = workout.title;
+      description = workout.description;
+      source = workout.source;
+      score_type = workout.score_type;
+      id = workout.id;
+    }
+  }
+  const date = $('#wo-date').val();
 
 
+  const response = await axios.post('/workouts/add_from_db', {title:title, description:description, source:source, score_type:score_type, id:id, date:date})
+  console.log(response)
+  if (response.status == 200) {
+    window.location.href = `/families/${response.data.results.family_id}/admin`
+  }
+})
 
 
+$("#option3").on('click', async function() {
+  $("#db-wo-search").addClass("d-none");
+  $("#db-wo-list").addClass("d-none");
+  $("#add-custom-wo").removeClass("d-none")
 
-
-
-
-
-
-const calendarEl = document.getElementById('calendar');
-const calendar = new FullCalendar.Calendar(calendarEl, {
-  headerToolbar: {
-    left: 'prev,next',
-    center: 'title',
-    right: 'today'
-  },
-  dayMaxEvents: true,
-  initialView: 'dayGridMonth',
-  displayEventTime: false
-
-});
-calendar.render();
-
-calendar.on('dateClick', function(info) {
-  alert('clicked on ' + info.dateStr);
-});
-  
-
-
+  const date = $("#wo-date").val();
+  const response = await axios.post('/workouts/add', {title:$("#title").val(), description:$("#description").val(), source:"self", score_type:$("#score_type").val(), date:date})
+  console.log(response)
+})
 

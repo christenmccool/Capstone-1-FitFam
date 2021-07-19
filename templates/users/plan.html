@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container text-center">
+
+  <div class="row justify-content-center">
+    {% for day_log in week_log %}
+    <ul class="col-md border list-group text-center p-0 m-0">
+
+      <li class="text-center list-group-item list-group-item-primary small">{{ day_log.day.strftime('%a, %b %d') }}</li>
+
+      {% for workout in day_log.workouts %}
+      <li class="text-center list-group-item pb-1">
+        <a href="{{ url_for('show_workout', workout_id=workout.id) }}" class="mb-1">{{ workout.title }}</a>
+        <p class="mb-0">{{ workout.description }}</p>
+
+      </li>
+      {% endfor %}
+
+
+    </ul>
+    {% endfor %}
+
+  </div>
+</div>
+
+
+
+{% endblock %}
+

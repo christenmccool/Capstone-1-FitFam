@@ -59,7 +59,8 @@ class User(db.Model):
     )
 
     role = db.Column(
-        db.Text
+        db.Text,
+        default = 'user'
     )
 
     primary_family_id = db.Column(

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, TextAreaField, RadioField
+from wtforms import StringField, PasswordField, SelectField, TextAreaField, RadioField, BooleanField, DateField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 
@@ -61,12 +61,12 @@ class SignupForm(FlaskForm):
 
     existing_family_name = StringField(
         'Existing FitFam name', 
-        validators=[Length(min=4, max=20), Optional(), illegal_character_check]
+        validators=[Length(min=4, max=25), Optional(), illegal_character_check]
     )
         
     new_family_name = StringField(
         'New FitFam name (no spaces)', 
-        validators=[Length(min=4, max=20), Optional(), illegal_character_check]
+        validators=[Length(min=4, max=25), Optional(), illegal_character_check]
     )
 
 
@@ -80,7 +80,11 @@ class ResultForm(FlaskForm):
 
     comment = TextAreaField(
         'Comment', 
-        validators=[DataRequired(), Length(max=400), illegal_character_check]
+        validators=[Optional(), Length(max=400), illegal_character_check]
+    )
+
+    date_completed = DateField(
+        'Date completed'    
     )
 
 class ResCommentForm(FlaskForm):
@@ -157,6 +161,70 @@ class LoginForm(FlaskForm):
         'Password', 
         validators=[Length(min=6, max=40), illegal_character_check]
     )
+
+
+class WorkoutAddForm(FlaskForm):
+    """Form for adding workout."""
+
+    # source = SelectField(
+    #     'Workout source',
+    #     choices = [('xx', 'Select a workout source...'), ('slate', 'Slate'), ('hq', 'Crossfit HQ'), ('self', 'Create your own')]
+    # )
+
+    title = StringField(
+        'Title', 
+        validators=[DataRequired(), Length(max=50)]
+    )
+
+    description = TextAreaField(
+        'Description', 
+        validators=[DataRequired(), Length(max=400)]
+    )
+
+    primary = BooleanField(
+        'Primary workout',
+        default = True
+    )
+
+    score_type = SelectField(
+        'Score type',
+        choices = [('Time', 'For Time'), ('Load', 'For Max Load'), ('Reps', 'For Max Reps'), ('Rounds + Reps', 'For Rounds plus Reps'), ('None', 'No score')],
+        default = 'none'
+    
+    )
+
+    date_posted = DateField(
+        'Date'    
+    )
+
+
+class WorkoutEditForm(FlaskForm):
+    """Form for editing workout."""
+
+    title = StringField(
+        'Title', 
+        validators=[Length(max=50)]
+    )
+
+    description = TextAreaField(
+        'Description', 
+        validators=[Length(max=400)]
+    )
+
+    primary = BooleanField(
+        'Primary workout'
+    )
+
+    score_type = SelectField(
+        'Score type',
+        choices = [('time', 'For Time'), ('Load', 'For Max Load'), ('Rounds + Reps', 'For Rounds plus Reps'), ('none', 'No score')]
+    )
+
+    date_posted = DateField(
+        'Date'
+    )
+
+
 
 class ChangePasswordForm(FlaskForm):
     """Form for changing user password."""

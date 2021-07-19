@@ -11,11 +11,32 @@
     <div class="col-md-8 text-center">
       <a class="fw-bold fs-3" href="/users/{{ user.id }}">@{{ user.username }}</a>
       <p class="fw-bold fs-4">{{ user.first_name.capitalize() }} {{ user.last_name.capitalize() }}</p>
+
+      {% if user.bio %}
       <p class="text-muted">{{ user.bio }}</p>
-      <a type="button" href="/users/edit" class="btn btn-sm btn-secondary my-1" id="save-result-btn">Edit Profile</a>
+      {% endif %}
+
+      <ul class="list-group">
+        {% for family in g.user.families %}
+          {% if family.id == g.user.primary_family_id %}
+            <a href="{{url_for('show_current_workout', family_id=family.id)}}" class="list-group-item list-group-item-primary mx-5">{{ family.name }}</a>
+          {% else %}
+            <a href="{{url_for('show_current_workout', family_id=family.id)}}" class="list-group-item mx-5">{{ family.name }}</a>
+          {% endif %}
+        {% endfor %}
+      </ul>
     </div>
   </div>
 </div>
+
+  <div class="d-grid d-flex justify-content-end mt-3">
+    <div class="">
+      <a type="button" href="/users/edit" class="btn btn-sm btn-outline-secondary my-1" id="save-result-btn">Edit Profile</a>
+    </div>
+  </div>
+  </div>
+
+
 
 {% endblock %}
 

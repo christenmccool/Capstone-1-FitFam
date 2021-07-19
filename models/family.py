@@ -11,7 +11,7 @@ class Family(db.Model):
     )
 
     name = db.Column(
-        db.String(20),
+        db.String(25),
         nullable=False,
         unique=True
     )
@@ -26,7 +26,7 @@ class Family(db.Model):
         db.Text
     )
 
-    users = db.relationship('User', secondary='users_families', backref='families', cascade = "all,delete")
+    users = db.relationship('User', secondary='users_families', backref='families')
 
     def serialize(self):
         return {"id": self.id,

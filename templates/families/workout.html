@@ -7,11 +7,15 @@
 
     <div class="m-3 col-md bg-light rounded-3">
       <div class="container-fluid py-2">
+        <strong><p class="m-0 text-end">{{ workout.family.name }}</p></strong>
         <em><p class="m-0">{{ workout.date_posted.strftime('%B %d, %Y') }}</p></em>
         <h1 class="display-6 fw-bold">{{ workout.title }}</h1>
         <p class="lh-sm" style="white-space:pre-wrap;">{{ workout.description }}</p>
-
+        
+        {% if not workout_complete %}
         <button class="btn btn-primary mb-2 btn-lg" type="button" id="log-result-btn">Log results</button>
+        {% endif %}
+
       </div>
     </div>
 
@@ -21,7 +25,7 @@
           
           {{ form.hidden_tag() }}
 
-          {% for field in form if field.widget.input_type != 'hidden' %}
+          {% for field in form if field.widget.input_type != 'hidden' and field.type != 'DateField' %}
             {% for error in field.errors %}
               <small class="text-danger">{{ error }}</small>
             {% endfor %}
@@ -29,6 +33,13 @@
             {{ field(placeholder=field.label.text, class="form-control form-control-lg my-2") }}
 
           {% endfor %}
+
+          {% for error in form.date_completed.errors %}
+          <div class="small text-danger">{{ error }}</div>
+          {% endfor %}  
+          {{form.date_completed.label(class_="form-label mb-0")}}
+          {{form.date_completed(type='date', class_="form-control mb-2 ")}}
+
         
           <div class="d-grid">
             <button type="submit" class="btn btn-primary my-1" id="save-result-btn">Save</button>
@@ -55,49 +66,77 @@
               <div class="result-area text-end">
                 <div class="fw-bold">{{ result.score }}</div>
                 <div>{{ result.comment }}</div>
+
+                {% if result.user == g.user %}
+                <div class="d-flex justify-content-end">
+                  <form action="/results/{{result.id}}/edit">
+                    <button type="submit" class="btn btn-sm btn-outline-primary py-0 my-1 me-2" id="edit-result-btn">Edit</button>
+                  </form>
+                  <form action="/results/{{result.id}}/delete" method="post">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary py-0 my-1" id="del-result-btn">Delete</button>
+                  </form>
+                </div>
+                {% endif %}
                 <a class="small text-secondary res-comment-btn cursor-pointer" id="res-comment-btn-{{result.id}}" >Comments</a>
               </div>
+    
             </div>
-
+            {% if result.res_comments %}
+            <ul class="list-group" id="res-comment-list-{{result.id}}">
+            {% else %}
             <ul class="list-group d-none" id="res-comment-list-{{result.id}}">
+            {% endif %}
 
 
-              {% for res_comment in result.res_comments %}
-                <li class="list-group-item">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="ms-2">
-                      <a href="/users/{{ res_comment.user_id }}">
-                        <img src="{{ res_comment.user.image_url }}" alt="user image" class="timeline-image me-2">
-                      </a>
-                      <a href="/users/{{ res_comment.user_id }}">@{{ res_comment.user.username }}</a>
-                      <span class="text-muted small">{{ res_comment.date.strftime('%B %d, %Y  %I:%M %p') }}</span>
-                    </div>
-                    <div class="result-area text-end">
-                      <div>{{ res_comment.res_comment }}</div>
-                    </div>
+            {% for res_comment in result.res_comments %}
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="ms-2">
+                    <a href="/users/{{ res_comment.user_id }}">
+                      <img src="{{ res_comment.user.image_url }}" alt="user image" class="timeline-image me-2">
+                    </a>
+                    <a href="/users/{{ res_comment.user_id }}">@{{ res_comment.user.username }}</a>
+                    <span class="text-muted small">{{ res_comment.date.strftime('%B %d, %Y  %I:%M %p') }}</span>
                   </div>
-                </li>
-              {% endfor %}
-              <input type="text" placeholder="Comment" name="res-comment-field-{{result.id}}" id="res-comment-field-{{result.id}}" class="form-control">
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-sm btn-outline-secondary mt-1" id="res-comment-save-btn-{{result.id}}">Save</button>
-              </div>
-            </ul>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
+                  <div class="result-area text-end">
+                    <div>{{ res_comment.res_comment }}</div>
+                  </div>
+
+                  {% if res_comment.user == g.user %}
+                  <div class="d-flex justify-content-end">
+                    <form action="/comments/{{res_comment.id}}/edit">
+                      <button type="submit" class="btn btn-sm btn-light text-secondary py-0 my-1 me-2" id="edit-res_comment-btn">Edit</button>
+                    </form>
+                    <form action="/comments/{{res_comment.id}}/delete" method="post">
+                      <button type="submit" class="btn btn-sm btn-light text-secondary py-0 my-1" id="del-res_comment-btn">Delete</button>
+                    </form>
+                  </div>
+                  {% endif %}
+
+                </div>
+              </li>
+            {% endfor %}
+
+            <input type="text" placeholder="Comment" name="res-comment-field-{{result.id}}" id="res-comment-field-{{result.id}}" class="form-control">
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-sm btn-outline-secondary mt-1" id="res-comment-save-btn-{{result.id}}">Save</button>
+            </div>
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
+</div>
 
-  <figure class="m-5">
-    <blockquote class="blockquote">
-      <p>{{quote.quote}}</p>
-    </blockquote>
-    <figcaption class="blockquote-footer">
-      {{quote.author}}
-    </figcaption>
-  </figure>
+<figure class="m-5">
+  <blockquote class="blockquote">
+    <p>{{quote.quote}}</p>
+  </blockquote>
+  <figcaption class="blockquote-footer">
+    {{quote.author}}
+  </figcaption>
+</figure>
 </div>
 
 

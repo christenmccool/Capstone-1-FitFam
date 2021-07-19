@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-5">
+      <h1 class="text-center my-4">Add a Workout</h1>
+
+      <div class="mx-sm-5 px-sm-5">
+        <input type="date" id="wo-date" value={{date}} class="form-control mb-2" disabled>
+      </div>
+
+
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+
+        <input type="radio" class="btn-check" name="options" id="option1">
+        <label class="btn btn-outline-secondary m-1" for="option1">Slate workout</label>
+
+        <input type="radio" class="btn-check" name="options" id="option2">
+        <label class="btn btn-outline-secondary m-1" for="option2">Search</label>
+
+        <input type="radio" class="btn-check" name="options" id="option3">
+        <label class="btn btn-outline-secondary m-1" for="option3">Create</label>
+        
+      </div>
+
+      <div id="add-db-wo" class="text-center m-3 rounded-3">
+
+        <div id="db-wo-search" class="d-none">      
+          <input type="text" placeholder="Search by title" class="form-control" id="db-wo-search-field" >
+          <div class="d-grid m-1 d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-primary my-1" id="db-wo-search-btn">Search</button>
+          </div>
+        </div>
+
+        <form id="db-wo-list" class="text-center" class="d-none">
+          <div id="db-wo-radio" class="text-center"></div>
+
+          <div class="d-grid">
+            <button type="button" id="db-wo-add-btn" class="btn btn-primary mx-3 my-1 d-none">Add DB Workout</button>
+          </div>
+
+        </form>
+
+      </div>
+
+      <div id="add-custom-wo" class="text-center m-3 rounded-3 d-none">
+
+        <form method="POST">
+        {{ form.hidden_tag() }}
+
+          <div id="wo-add-fields">
+            {% for field in form if field.widget.input_type != 'hidden' and field.type != 'DateField' and field.type != 'BooleanField' and field.type != 'SelectField' and field.type != 'RadioField'%}
+              {% for error in field.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+
+              {{field.label(class_="form-label mb-2")}}
+              {{field(class_="form-control mb-2")}}
+
+            {% endfor %}
+
+            {% for error in form.date_posted.errors %}
+            <div class="small text-danger">{{ error }}</div>
+            {% endfor %}  
+            {{form.date_posted.label(class_="form-label mb-0")}}
+            {{form.date_posted(type='date', class_="form-control mb-2 ", disabled= 'disabled')}}
+
+            {% for error in form.score_type.errors %}
+              <div class="small text-danger">{{ error }}</div>
+            {% endfor %}  
+            {{form.score_type.label(class_="form-label mb-0")}}
+            {{form.score_type(class_="form-select mb-2")}}
+
+            {% for error in form.primary.errors %}
+              <div class="small text-danger">{{ error }}</div>
+            {% endfor %}  
+            {{form.primary.label(class_="form-label mb-0")}}
+            {{form.primary(class_="form-check mb-2")}}
+
+          </div>
+          <div class="d-grid">
+            <button type="submit" id="wo-add-btn" class="btn btn-primary mx-3 my-1">Add Workout</button>
+          </div>
+
+        </form>
+      </div>
+      
+    </div>
+  </div>
+
+{% endblock %}

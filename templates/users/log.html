@@ -2,23 +2,22 @@
 
 {% block content %}
 <div class="container text-center">
-
-  {{ calendar }}
   <div class="row justify-content-center">
-    {% for day_log in week_log %}
-    <div class="col-md border ">
-
-      <div class="text-center">
-        <p class="small mb-0">{{ day_log.day.strftime('%a, %b %d') }}</p>
-        {% for result in day_log.results %}
-          <p class="mb-0">{{ result.workout.title }}</p>
-
-          <p class="fw-bold mb-1">{{ result.score }}</p>
-          <p>{{ result.comment }}</p>
+    {% for day in results_by_date %}
+    <ul class="border col-md-9 list-group text-center rounded-3 p-0 my-3">
+      <li class="text-center list-group-item list-group-item-dark">
+        <p class="small">{{ day.date.strftime('%a, %b %d') }}</p>
+        <ul class="border list-group text-center p-0 m-0 mb-2">
+          {% for result in day.results %}
+          <div class="list-group-item">
+            <a href="{{ url_for("show_workout", workout_id=result.workout.id) }}" class="small mb-1">{{ result.workout.title }}</a>
+            <p class="mb-0">{{ result.score }}</p>
+            <p class="mt-0 mb-0">{{ result.comment }}</p>
+          </div>
           {% endfor %}
-      </div>
-
-    </div>
+        </ul>
+      </li>
+    </ul>
     {% endfor %}
 
   </div>
