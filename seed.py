@@ -9,7 +9,6 @@ from models.result import Result, ResComment
 from models.workout import Workout_from_db
 
 
-from flask import jsonify
 import requests
 from secret import API_KEY
 from datetime import date, timedelta
@@ -61,7 +60,6 @@ user2.primary_family_id = family1.id
 user3.primary_family_id = family2.id
 user4.primary_family_id = family2.id
 
-
 yesterday = date.today() - timedelta(days=1)
 
 workout1 = Workout(family_id = family1.id, source='misc', title='Run 5 miles', description='Keep a steady pace', score_type='Time', date_posted=yesterday)
@@ -84,7 +82,7 @@ db.session.add(res_comment1)
 db.session.commit()
 
 
-
+#Add workouts to database from SugarWOD API
 SUGARWOD_BASE_URL = "https://api.sugarwod.com/v2"
 
 def add_quotes_from_db():

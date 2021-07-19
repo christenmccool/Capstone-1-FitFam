@@ -9,7 +9,6 @@
 
       <li class="text-center list-group-item list-group-item-primary small">{{ day_log.day.strftime('%a, %b %d') }}</li>
 
-
       {% for workout in day_log.workouts %}
       <li class="text-center list-group-item pb-1">
         <a href="{{ url_for('show_workout', workout_id=workout.id) }}" class="mb-1">{{ workout.title }}</a>
