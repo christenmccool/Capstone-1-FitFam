@@ -33,44 +33,44 @@ TODAY_STR = TODAY.strftime('%Y%m%d')
 QUOTE_BASE_URL = "https://zenquotes.io/api/"
 SUGARWOD_BASE_URL = "https://api.sugarwod.com/v2"
 
-def update_db():
-    DEFAULT_QUOTE = Quote.query.filter(Quote.date == TODAY).first()
+# def update_db():
+#     DEFAULT_QUOTE = Quote.query.filter(Quote.date == TODAY).first()
 
-    if not DEFAULT_QUOTE: 
-        url = QUOTE_BASE_URL + '/random'
-        response = requests.get(url)
-        try:
-            quote = response.json()[0]
-            DEFAULT_QUOTE = Quote(quote=quote['q'], author=quote['a'], date=TODAY)
-            db.session.add(DEFAULT_QUOTE)
-            db.session.commit()
-        except:
-            DEFAULT_QUOTE = Quote.query.filter(Quote.date == date(2020,1,1)).first()
+#     if not DEFAULT_QUOTE: 
+#         url = QUOTE_BASE_URL + '/random'
+#         response = requests.get(url)
+#         try:
+#             quote = response.json()[0]
+#             DEFAULT_QUOTE = Quote(quote=quote['q'], author=quote['a'], date=TODAY)
+#             db.session.add(DEFAULT_QUOTE)
+#             db.session.commit()
+#         except:
+#             DEFAULT_QUOTE = Quote.query.filter(Quote.date == date(2020,1,1)).first()
             
-    slate_workout_list = Workout_from_db.query.filter(Workout_from_db.date == TODAY, Workout_from_db.source == 'slate').all()
-    if slate_workout_list:
-        DEFAULT_WORKOUT = slate_workout_list[1] if len(slate_workout_list)>1 else slate_workout_list[0]
+#     slate_workout_list = Workout_from_db.query.filter(Workout_from_db.date == TODAY, Workout_from_db.source == 'slate').all()
+#     if slate_workout_list:
+#         DEFAULT_WORKOUT = slate_workout_list[1] if len(slate_workout_list)>1 else slate_workout_list[0]
 
-    else:
-        try:
-            url = SUGARWOD_BASE_URL + '/workouts'
-            response = requests.get(url, params= {"apiKey": API_KEY, "dates": TODAY_STR})
-            workout_list = response.json().get('data')
-            if data:
-                for workout in workout_list:
-                    wo_info = workout.get("attributes")
-                    wo = Workout_from_db(title=wo_info['title'], description=wo_info['description'], score_type=wo_info['score_type'], source='slate', date=TODAY)
-                    db.session.add(wo)
-                db.session.commit()
-                DEFAULT_WORKOUT = workout_list[1] if len(workout_list)>1 else workout_list[0]
-        except:
-            DEFAULT_WORKOUT = Workout_from_db.query.filter(Workout_from_db.date == date(2020,1,1)).first()
+#     else:
+#         try:
+#             url = SUGARWOD_BASE_URL + '/workouts'
+#             response = requests.get(url, params= {"apiKey": API_KEY, "dates": TODAY_STR})
+#             workout_list = response.json().get('data')
+#             if data:
+#                 for workout in workout_list:
+#                     wo_info = workout.get("attributes")
+#                     wo = Workout_from_db(title=wo_info['title'], description=wo_info['description'], score_type=wo_info['score_type'], source='slate', date=TODAY)
+#                     db.session.add(wo)
+#                 db.session.commit()
+#                 DEFAULT_WORKOUT = workout_list[1] if len(workout_list)>1 else workout_list[0]
+#         except:
+#             DEFAULT_WORKOUT = Workout_from_db.query.filter(Workout_from_db.date == date(2020,1,1)).first()
 
-    return {"DEFAULT_QUOTE": DEFAULT_QUOTE, "DEFAULT_WORKOUT": DEFAULT_WORKOUT}
+#     return {"DEFAULT_QUOTE": DEFAULT_QUOTE, "DEFAULT_WORKOUT": DEFAULT_WORKOUT}
 
-default_values = update_db()
-DEFAULT_QUOTE = default_values['DEFAULT_QUOTE']
-DEFAULT_WORKOUT = default_values['DEFAULT_WORKOUT']
+# default_values = update_db()
+# DEFAULT_QUOTE = default_values['DEFAULT_QUOTE']
+# DEFAULT_WORKOUT = default_values['DEFAULT_WORKOUT']
 
 
 def check_logged_in(func):
@@ -105,6 +105,18 @@ def home():
     - logged in family account users: workout of the day page 
     - logged in individual account users: workout log
     """
+    quote = Quote.query.filter(Quote.date == TODAY).first()
+
+    if not quote: 
+        url = QUOTE_BASE_URL + '/random'
+        response = requests.get(url)
+        try:
+            quote = response.json()[0]
+            quote = Quote(quote=quote['q'], author=quote['a'], date=TODAY)
+            db.session.add(quote)
+            db.session.commit()
+        except:
+            quote = Quote.query.filter(Quote.date == date(2020,1,1)).first()
 
     if g.user:
         # if g.user.account_type == 'fam':
@@ -113,7 +125,7 @@ def home():
         #     return redirect(url_for('show_log', user_id=g.user.id))
         return redirect(url_for('show_current_workout', family_id=g.user.primary_family_id))
     else:
-        return render_template('home_anon.html', quote=DEFAULT_QUOTE)
+        return render_template('home_anon.html', quote=quote)
 
 
 @app.route('/families/<int:family_id>')
@@ -124,11 +136,37 @@ def show_current_workout(family_id):
     family = Family.query.get_or_404(family_id)
 
     workout = Workout.query.filter(Workout.family_id == family.id, Workout.date_posted==TODAY).order_by(Workout.primary.desc()).first()
-    
+
     if not workout:
-        workout = Workout(family_id=family.id, title=DEFAULT_WORKOUT.title, description=DEFAULT_WORKOUT.description, score_type=DEFAULT_WORKOUT.score_type, source=DEFAULT_WORKOUT.source, primary=True, date_posted=TODAY)
+        slate_workout_list = Workout_from_db.query.filter(Workout_from_db.date == TODAY, Workout_from_db.source == 'slate').all()
+
+        if slate_workout_list:
+            workout_from_db = slate_workout_list[1] if len(slate_workout_list)>1 else slate_workout_list[0]
+
+        else:
+            try:
+                url = SUGARWOD_BASE_URL + '/workouts'
+                response = requests.get(url, params= {"apiKey": API_KEY, "dates": TODAY_STR})
+                workout_list = response.json().get('data')
+                for workout in workout_list:
+                    wo_info = workout.get("attributes")
+                    wo = Workout_from_db(title=wo_info['title'], description=wo_info['description'], score_type=wo_info['score_type'], source='slate', date=TODAY)
+                    db.session.add(wo)
+                db.session.commit()
+                workout_from_db = workout_list[1] if len(workout_list)>1 else workout_list[0]
+            except:
+                workout_from_db = Workout_from_db.query.filter(Workout_from_db.date == date(2020,1,1)).first()
+            
+        workout = Workout(family_id=g.user.primary_family_id, title=workout_from_db.title, description=workout_from_db.description, primary=True, score_type=workout_from_db.score_type, source=workout_from_db.source, date_posted=TODAY)
         db.session.add(workout)
         db.session.commit()
+
+
+
+    # if not workout:
+    #     workout = Workout(family_id=family.id, title=DEFAULT_WORKOUT.title, description=DEFAULT_WORKOUT.description, score_type=DEFAULT_WORKOUT.score_type, source=DEFAULT_WORKOUT.source, primary=True, date_posted=TODAY)
+    #     db.session.add(workout)
+    #     db.session.commit()
 
     return redirect(url_for('show_workout', workout_id=workout.id))
 
@@ -139,6 +177,18 @@ def show_workout(workout_id):
     """Show workout results and result comments.
     Post workout results for a given workout.
     """
+    quote = Quote.query.filter(Quote.date == TODAY).first()
+
+    if not quote: 
+        url = QUOTE_BASE_URL + '/random'
+        response = requests.get(url)
+        try:
+            quote = response.json()[0]
+            quote = Quote(quote=quote['q'], author=quote['a'], date=TODAY)
+            db.session.add(quote)
+            db.session.commit()
+        except:
+            quote = Quote.query.filter(Quote.date == date(2020,1,1)).first()
 
     workout = Workout.query.get_or_404(workout_id)
 
@@ -159,7 +209,7 @@ def show_workout(workout_id):
         if result:
             workout_complete = True
 
-        return render_template('families/workout.html', workout=workout, quote=DEFAULT_QUOTE, form=form, result_list=result_list, workout_complete=workout_complete)
+        return render_template('families/workout.html', workout=workout, quote=quote, form=form, result_list=result_list, workout_complete=workout_complete)
         
     flash("Access unauthorized. You may only access content for your own family.", "danger")
     return redirect(url_for('home'))
@@ -279,7 +329,7 @@ def show_log():
     """Show workout log for current user."""
 
     results = Result.query.filter(Result.user_id==g.user.id).order_by(Result.date_completed).all()
-    print(results)
+
     result_dates = [result.date_completed.date() for result in results]
     result_dates = set(result_dates)
     result_dates = list(result_dates)
@@ -618,23 +668,32 @@ def search_workouts():
         workouts = Workout_from_db.query.filter(Workout_from_db.title.ilike(f"%{search_by_title}%")).all()
 
     if search_by_date:
+        search_by_date = search_by_date.split('-')
+        search_by_date = "".join(search_by_date)
+
         workouts = Workout_from_db.query.filter(Workout_from_db.date == search_by_date, Workout_from_db.source == 'slate').all()
 
         if not workouts:
             workouts =[]
             url = SUGARWOD_BASE_URL + '/workouts'
             response = requests.get(url, params= {"apiKey": API_KEY, "dates": search_by_date})
+            print("search_by_date", search_by_date)
+            print("response", response.json())
+
+
             workout_list = response.json().get('data')
+            print("workout_list", workout_list)
 
             if workout_list:
                 for workout in workout_list:
                     wo_info = workout.get("attributes")
                     wo = Workout_from_db(title=wo_info['title'], description=wo_info['description'], score_type=wo_info['score_type'], source='slate', date=wo_info['scheduled_date'])
                     db.session.add(wo)
+                    workouts.append(wo)
+
                 db.session.commit()
         
-                workouts.append(wo)
-
+    print("workouts", workouts)
     if workouts:
         workouts_serialized = [workout.serialize() for workout in workouts]
 
