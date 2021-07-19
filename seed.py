@@ -11,8 +11,8 @@ from datetime import date, timedelta
 # db.session.rollback()
 # db.session.commit()
 
-# db.drop_all()
-# db.create_all()
+db.drop_all()
+db.create_all()
 
 
 user1 = User.register(username='bobby', password='password', email='bob@mail.com', first_name='bob', last_name='jones')
