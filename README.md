@@ -22,3 +22,5 @@ https://app.sugarwod.com/developers-api-docs
 The ZenQuotes API provides a daily quote. 
 https://zenquotes.io/api/
 
+### Technology Stack:   
+This app was created using Python, Flask, SQLAlchemy, and Javascript.
