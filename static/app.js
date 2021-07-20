@@ -1,26 +1,23 @@
+//Show correct fields in Signup Form when the template is rendered again with errors
 if ($("[type='radio'][name='account_type']:checked").val() === 'ind') {
-  console.log('ind')
   $("#individual-info").removeClass("d-none");
   $("#family-info").addClass("d-none");
 }
 if ($("[type='radio'][name='account_type']:checked").val()  === 'fam') {
-  console.log('fam')
   $("#family-info").removeClass("d-none");
   $("#individual-info").addClass("d-none");
 }
 
 if ($("[type='radio'][name='family_account_type']:checked").val() === 'existing') {
-  console.log('ind')
   $("#existing-family-info").removeClass("d-none");
   $("#new-family-info").addClass("d-none");
 }
 if ($("[type='radio'][name='family_account_type']:checked").val()  === 'new') {
-  console.log('fam')
   $("#new-family-info").removeClass("d-none");
   $("#existing-family-info").addClass("d-none");
 }
 
-
+//Change display as Signup form is filled out
 $("[type='radio'][name='account_type']").click(function() {
   if ($(this).val() === 'ind') {
     $("#individual-info").removeClass("d-none");
@@ -50,6 +47,7 @@ $("[type='radio'][name='family_account_type']").click(function() {
   }
 });
 
+//Update content of modal to display results of family search
 $("#family-search-btn").click(async function() {
   $("#searchModal .modal-body").empty()
   const q = $("#family-search").val();
@@ -74,15 +72,15 @@ $("#family-search-btn").click(async function() {
     }
     html += "</ul>"
   }
-  console.log(html)
   $("#searchModal .modal-body").append(html)
 });
 
-
+//Shows add result form 
 $("#log-result-btn").click(function() {
   $("#log-result-div").removeClass("d-none");
 })
 
+//Display comments on results and allow users to make comments on results
 $("#results-div").click(async function() {
   if (event.target.id.includes('res-comment-btn')) {
     let targetId = event.target.id
@@ -126,8 +124,11 @@ $("#results-div").click(async function() {
 })
 
 
+//Add workouts
+//Option 1: Add daily Slate workout
+//Option 2: Add results of a search of the database
+//Option 3: Create own workout
 let dbWoList = []
-
 $("#option1").on('click', async function() {
   $("#db-wo-search").addClass("d-none");
   $("#db-wo-list").removeClass("d-none");
@@ -139,7 +140,6 @@ $("#option1").on('click', async function() {
     let date = $("#wo-date").val();
 
     const response = await axios.get('/workouts', {params: {date: date}});
-    console.log(response)
     const results = response.data.results;
     if (results.length > 0) {
       for (workout of results) {
@@ -213,7 +213,6 @@ $("#db-wo-add-btn").on('click', async function(event) {
 
 
   const response = await axios.post('/workouts/add_from_db', {title:title, description:description, source:source, score_type:score_type, id:id, date:date})
-  console.log(response)
   if (response.status == 200) {
     window.location.href = `/families/${response.data.results.family_id}/admin`
   }
@@ -227,6 +226,5 @@ $("#option3").on('click', async function() {
 
   const date = $("#wo-date").val();
   const response = await axios.post('/workouts/add', {title:$("#title").val(), description:$("#description").val(), source:"self", score_type:$("#score_type").val(), date:date})
-  console.log(response)
 })
 

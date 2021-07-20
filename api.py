@@ -65,7 +65,6 @@ def add_workouts_from_db():
         six_days_prior = last_day - timedelta(days=6)
         six_days_prior_str = six_days_prior.strftime('%Y%m%d')
 
-  
         url = SUGARWOD_BASE_URL + f"/workouts?dates={six_days_prior_str}-{last_day_str}"
         response = requests.get(url, params= {"apiKey": API_KEY})
         workout_list = response.json().get('data')

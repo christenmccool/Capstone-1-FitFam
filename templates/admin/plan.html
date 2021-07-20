@@ -21,7 +21,6 @@
         </form>
       </li>
       {% endfor %}
-
       <form action="{{ url_for('add_workout', wo_date=day_log.day) }}">
         <button type="submit" class="btn btn-primary btn-sm m-2">Add workout</button>
       </form>

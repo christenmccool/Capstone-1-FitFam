@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import extract
 import requests
 import calendar
-# from db import db, connect_db, update_db
 from db import db, connect_db
 import functools
 from forms import SignupForm, LoginForm, ResultForm, ResCommentForm, UserEditForm, WorkoutAddForm, WorkoutEditForm
@@ -27,50 +26,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgres
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-#Get the default daily quote and workout from the database
 TODAY = date.today()
 TODAY_STR = TODAY.strftime('%Y%m%d')
+
 QUOTE_BASE_URL = "https://zenquotes.io/api/"
 SUGARWOD_BASE_URL = "https://api.sugarwod.com/v2"
-
-# def update_db():
-#     DEFAULT_QUOTE = Quote.query.filter(Quote.date == TODAY).first()
-
-#     if not DEFAULT_QUOTE: 
-#         url = QUOTE_BASE_URL + '/random'
-#         response = requests.get(url)
-#         try:
-#             quote = response.json()[0]
-#             DEFAULT_QUOTE = Quote(quote=quote['q'], author=quote['a'], date=TODAY)
-#             db.session.add(DEFAULT_QUOTE)
-#             db.session.commit()
-#         except:
-#             DEFAULT_QUOTE = Quote.query.filter(Quote.date == date(2020,1,1)).first()
-            
-#     slate_workout_list = Workout_from_db.query.filter(Workout_from_db.date == TODAY, Workout_from_db.source == 'slate').all()
-#     if slate_workout_list:
-#         DEFAULT_WORKOUT = slate_workout_list[1] if len(slate_workout_list)>1 else slate_workout_list[0]
-
-#     else:
-#         try:
-#             url = SUGARWOD_BASE_URL + '/workouts'
-#             response = requests.get(url, params= {"apiKey": API_KEY, "dates": TODAY_STR})
-#             workout_list = response.json().get('data')
-#             if data:
-#                 for workout in workout_list:
-#                     wo_info = workout.get("attributes")
-#                     wo = Workout_from_db(title=wo_info['title'], description=wo_info['description'], score_type=wo_info['score_type'], source='slate', date=TODAY)
-#                     db.session.add(wo)
-#                 db.session.commit()
-#                 DEFAULT_WORKOUT = workout_list[1] if len(workout_list)>1 else workout_list[0]
-#         except:
-#             DEFAULT_WORKOUT = Workout_from_db.query.filter(Workout_from_db.date == date(2020,1,1)).first()
-
-#     return {"DEFAULT_QUOTE": DEFAULT_QUOTE, "DEFAULT_WORKOUT": DEFAULT_WORKOUT}
-
-# default_values = update_db()
-# DEFAULT_QUOTE = default_values['DEFAULT_QUOTE']
-# DEFAULT_WORKOUT = default_values['DEFAULT_WORKOUT']
 
 
 def check_logged_in(func):
@@ -131,7 +91,9 @@ def home():
 @app.route('/families/<int:family_id>')
 @check_logged_in
 def show_current_workout(family_id):
-    """Show family's current workout."""
+    """Show family's current workout.
+    Default workout is the Slate daily workout if no other workout has been posted.
+    """
 
     family = Family.query.get_or_404(family_id)
 
@@ -160,13 +122,6 @@ def show_current_workout(family_id):
         workout = Workout(family_id=g.user.primary_family_id, title=workout_from_db.title, description=workout_from_db.description, primary=True, score_type=workout_from_db.score_type, source=workout_from_db.source, date_posted=TODAY)
         db.session.add(workout)
         db.session.commit()
-
-
-
-    # if not workout:
-    #     workout = Workout(family_id=family.id, title=DEFAULT_WORKOUT.title, description=DEFAULT_WORKOUT.description, score_type=DEFAULT_WORKOUT.score_type, source=DEFAULT_WORKOUT.source, primary=True, date_posted=TODAY)
-    #     db.session.add(workout)
-    #     db.session.commit()
 
     return redirect(url_for('show_workout', workout_id=workout.id))
 
@@ -214,6 +169,7 @@ def show_workout(workout_id):
     flash("Access unauthorized. You may only access content for your own family.", "danger")
     return redirect(url_for('home'))
 
+
 @app.route('/results/<int:result_id>', methods=["POST"])
 @check_logged_in
 def comment_on_result(result_id):
@@ -234,6 +190,7 @@ def comment_on_result(result_id):
     
     flash("Access unauthorized. You may only edit your own content.", "danger")
     return redirect(url_for('home'))
+
 
 @app.route('/results/<int:result_id>/edit', methods=["GET", "POST"])
 @check_logged_in
@@ -276,6 +233,7 @@ def delete_result(result_id):
     flash("Access unauthorized. You may only delete your own content.", "danger")
     return redirect(url_for('home'))
 
+
 @app.route('/comments/<int:comment_id>/edit', methods=["GET", "POST"])
 @check_logged_in
 def edit_comment(comment_id):
@@ -296,6 +254,7 @@ def edit_comment(comment_id):
 
     flash("Access unauthorized. You may only edit your own content.", "danger")
     return redirect(url_for('home'))
+
 
 @app.route('/comments/<int:comment_id>/delete', methods=["POST"])
 @check_logged_in
@@ -346,6 +305,7 @@ def show_log():
         results_by_date.append({"date": date, "results": results})
 
     return render_template('users/log.html', results_by_date=results_by_date)
+
 
 @app.route('/users/plan')
 @check_logged_in
@@ -422,9 +382,7 @@ def delete_workout(workout_id):
 @check_logged_in
 def add_workout(wo_date):
     """Allow admin to add a workout."""
-
     if g.user.role == 'admin':
-
         wo_date = datetime.strptime(wo_date, '%Y-%m-%d').date()
         form = WorkoutAddForm(date_posted=wo_date)
 
@@ -677,12 +635,8 @@ def search_workouts():
             workouts =[]
             url = SUGARWOD_BASE_URL + '/workouts'
             response = requests.get(url, params= {"apiKey": API_KEY, "dates": search_by_date})
-            print("search_by_date", search_by_date)
-            print("response", response.json())
-
 
             workout_list = response.json().get('data')
-            print("workout_list", workout_list)
 
             if workout_list:
                 for workout in workout_list:
@@ -693,7 +647,6 @@ def search_workouts():
 
                 db.session.commit()
         
-    print("workouts", workouts)
     if workouts:
         workouts_serialized = [workout.serialize() for workout in workouts]
 
