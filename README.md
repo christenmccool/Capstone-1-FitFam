@@ -18,7 +18,7 @@ Family administrators choose the daily workout for their family either from the 
 
 ### API:   
 The workouts in the FitFam workout database were obtained from SugarWOD API. Daily default workouts come from SugarWOD as well.
-https://app.sugarwod.com/developers-api-docs
+https://app.sugarwod.com/developers-api-docs  
 The ZenQuotes API provides a daily quote. 
 https://zenquotes.io/api/
 
