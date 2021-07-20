@@ -250,7 +250,7 @@ def edit_comment(comment_id):
             db.session.commit()
             return redirect(url_for('home'))
 
-        return render_template('results/edit.html', form=form)
+        return render_template('results/comments.html', form=form)
 
     flash("Access unauthorized. You may only edit your own content.", "danger")
     return redirect(url_for('home'))

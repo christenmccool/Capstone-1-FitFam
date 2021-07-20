@@ -106,8 +106,6 @@ class UserViewTestCase(TestCase):
             with c.session_transaction() as sess:
                 sess['curr_user'] = self.testuser.id
 
-            # testworkout = Workout.query.filter(Workout.family_id==self.testfamily.id).first
-
             resp = c.post(f"/workouts/{self.testworkout.id}", data={"score":"60", "comment":"Felt great"}, follow_redirects=True)
             html = resp.get_data(as_text=True)
 

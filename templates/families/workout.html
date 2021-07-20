@@ -61,12 +61,11 @@
                   <img src="{{ result.user.image_url }}" alt="user image" class="timeline-image me-2">
                 </a>
                 <a href="/users/{{ result.user.id }}">@{{ result.user.username }}</a>
-                <span class="text-muted small">{{ result.date_completed.strftime('%B %d, %Y  %I:%M %p') }}</span>
+                <!-- <span class="text-muted small">{{ result.date_completed.strftime('%B %d, %Y  %I:%M %p') }}</span> -->
               </div>
               <div class="result-area text-end">
                 <div class="fw-bold">{{ result.score }}</div>
                 <div>{{ result.comment }}</div>
-
                 {% if result.user == g.user %}
                 <div class="d-flex justify-content-end">
                   <form action="/results/{{result.id}}/edit">
