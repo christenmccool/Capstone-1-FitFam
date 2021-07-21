@@ -124,4 +124,3 @@ class User(db.Model):
 
         return False
 
-

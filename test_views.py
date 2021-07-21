@@ -1,8 +1,6 @@
 """View tests."""
 
-# run these tests like:
-#
-#    FLASK_ENV=production python -m unittest test_message_views.py
+#    FLASK_ENV=production python -m unittest test_views.py
 
 
 import os
@@ -28,13 +26,15 @@ class UserViewTestCase(TestCase):
     """Test views for users."""
 
     def setUp(self):
+    # def testSetUp(self):
+
         """Create test client, add sample data."""
         User_Family.query.delete()
+        Result.query.delete()
         Workout.query.delete()
         User.query.delete()
         Family.query.delete()
         db.session.commit()
-
 
         self.client = app.test_client()
 
@@ -87,16 +87,14 @@ class UserViewTestCase(TestCase):
                   "password":"password",
                   "first_name":"Sally",
                   "last_name":"Jones",
-                  "existing_family_name": "testfam"}
+                  "new_family_name": "testfam2"}
 
             resp = c.post("/signup", data=data, follow_redirects=True)
             html = resp.get_data(as_text = True)
-
             self.assertEqual(resp.status_code, 200)
 
             u = User.query.filter(User.email == "test2@test.com").first()
-            self.assertIn(f'<strong><p class="m-0 text-end">testfam</p></strong>', html)
-
+            self.assertIn(f'<strong><p class="m-0 text-end">testfam2</p></strong>', html)
 
 
     def test_can_add_result(self):
@@ -105,6 +103,19 @@ class UserViewTestCase(TestCase):
         with self.client as c:
             with c.session_transaction() as sess:
                 sess['curr_user'] = self.testuser.id
+
+            # testfamily = Family(name="testfam")
+            # db.session.add(testfamily)
+            # db.session.commit()
+
+            # testfamily.users.append(self.testuser)
+            # self.testuser.primary_family_id = testfamily.id
+
+            # testworkout = Workout(family_id = testfamily.id, title='Run 5 miles', description='Keep a steady pace', score_type='Time')
+            # db.session.add(testworkout)
+            # db.session.commit()
+            # resp = c.post(f"/workouts/{testworkout.id}", data={"score":"60", "comment":"Felt great"}, follow_redirects=True)
+
 
             resp = c.post(f"/workouts/{self.testworkout.id}", data={"score":"60", "comment":"Felt great"}, follow_redirects=True)
             html = resp.get_data(as_text=True)

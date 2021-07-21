@@ -114,11 +114,12 @@ def show_current_workout(family_id):
                     wo_info = workout.get("attributes")
                     wo = Workout_from_db(title=wo_info['title'], description=wo_info['description'], score_type=wo_info['score_type'], source='slate', date=TODAY)
                     db.session.add(wo)
+                    workout_from_db = wo
                 db.session.commit()
-                workout_from_db = workout_list[1] if len(workout_list)>1 else workout_list[0]
+                # workout_from_db = workout_list[1] if len(workout_list)>1 else workout_list[0]
             except:
                 workout_from_db = Workout_from_db.query.filter(Workout_from_db.date == date(2020,1,1)).first()
-            
+
         workout = Workout(family_id=g.user.primary_family_id, title=workout_from_db.title, description=workout_from_db.description, primary=True, score_type=workout_from_db.score_type, source=workout_from_db.source, date_posted=TODAY)
         db.session.add(workout)
         db.session.commit()

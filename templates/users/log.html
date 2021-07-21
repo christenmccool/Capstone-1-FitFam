@@ -4,14 +4,14 @@
 <div class="container text-center">
   <div class="row justify-content-center">
     {% for day in results_by_date %}
-    <ul class="border col-md-9 list-group text-center rounded-3 p-0 my-3">
-      <li class="text-center list-group-item list-group-item-dark">
+    <ul class="border col-md-9 list-group text-center rounded-3 p-0 my-1">
+      <li class="text-center list-group-item list-group-item-secondary">
         <p class="small">{{ day.date.strftime('%a, %b %d') }}</p>
         <ul class="border list-group text-center p-0 m-0 mb-2">
           {% for result in day.results %}
           <div class="list-group-item">
             <a href="{{ url_for("show_workout", workout_id=result.workout.id) }}" class="small mb-1">{{ result.workout.title }}</a>
-            <p class="mb-0">{{ result.score }}</p>
+            <p class="mb-0"><strong>{{ result.score }}</strong></p>
             <p class="mt-0 mb-0">{{ result.comment }}</p>
           </div>
           {% endfor %}

@@ -1,7 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy 
-import requests
-from secret import API_KEY
-
 
 db = SQLAlchemy()
 
